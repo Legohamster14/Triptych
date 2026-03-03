@@ -21,6 +21,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	int32 PlayerReach = 500;
+
+	int32 ObjectDistanceFromPlayer = 100;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,4 +37,16 @@ protected:
 
 	void CameraYaw(float InputValue);
 	void CamerPitch(float InputValue);
+
+	void LeftMouseInteract();
+	void DropObject();
+
+	bool bPickedUpObject = false;
+
+	FCollisionQueryParams LeftMouseQueryParams;
+
+	class AGrabbableObject* GrabbedObjectReference;
+
+	class APuzzleGridBase* PuzzleBoardRef;
+
 };
