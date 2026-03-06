@@ -4,6 +4,8 @@
 #include "Triptych2/Puzzle/PuzzleGridBase.h"
 #include "Components/SphereComponent.h"
 #include "Triptych2/Puzzle/PuzzlePin.h"
+#include "Components/TextRenderComponent.h"
+#include "Internationalization/Text.h"
 
 // Sets default values
 APuzzleGridBase::APuzzleGridBase()
@@ -16,19 +18,22 @@ APuzzleGridBase::APuzzleGridBase()
 	BigSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Big Sphere"));
 	MediumSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Medium Sphere"));
 	SmallSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Small Sphere"));
+	BoardText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Board Text"));
 
 	RootSceneComponent->SetupAttachment(RootComponent);
-	Plane->SetupAttachment(RootComponent);
+	Plane->SetupAttachment(RootSceneComponent);
 	BigSphereCollider->SetupAttachment(RootSceneComponent);
 	MediumSphereCollider->SetupAttachment(BigSphereCollider);
 	SmallSphereCollider->SetupAttachment(BigSphereCollider);
+	BoardText->SetupAttachment(RootSceneComponent);
 }
 
 // Called when the game starts or when spawned
 void APuzzleGridBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoardText->SetText(FText::FromString("Can you guess where this is?"));
 }
 
 void APuzzleGridBase::Tick(float DeltaTime)
@@ -91,8 +96,23 @@ void APuzzleGridBase::OnSmallEndOverlap(UPrimitiveComponent* OverlappedComp, AAc
 
 void APuzzleGridBase::PinCheck()
 {
-	UE_LOG(LogTemp, Log, TEXT("The Pin is in the: %s, %s, %s"),
-		(bPinInBigRange ? TEXT("Big Range") : TEXT("Not Big Range")),
-		(bPinInMediumRange ? TEXT("Medium Range") : TEXT("Not Medium Range")),
-		(bPinInSmallRange ? TEXT("Small Range") : TEXT("Not Small Range")));
+	if (bPinInBigRange) {
+		PinReference->bGrabbable = false;
+	}
+
+	if (bPinInSmallRange)
+	{
+		BoardText->SetText(FText::FromString("You are very close!"));
+	}
+	else if (bPinInMediumRange)
+	{
+		BoardText->SetText(FText::FromString("You are close!"));
+	}
+	else if (bPinInBigRange) {
+		BoardText->SetText(FText::FromString("You are far!"));
+	}
+	else
+	{
+		BoardText->SetText(FText::FromString("Keep Trying!"));
+	}
 }

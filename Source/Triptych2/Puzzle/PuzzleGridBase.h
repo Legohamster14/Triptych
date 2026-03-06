@@ -26,6 +26,9 @@ public:
 	bool bPinInMediumRange = false;
 	bool bPinInSmallRange = false;
 
+	UPROPERTY(EditAnywhere, Category = "Components")
+	class UTextRenderComponent* BoardText;
+
 	UFUNCTION()
 	void PinCheck();
 

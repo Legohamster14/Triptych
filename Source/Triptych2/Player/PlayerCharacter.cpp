@@ -89,7 +89,7 @@ void APlayerCharacter::LeftMouseInteract()
 		//DrawDebugLine(GetWorld(), LineTraceStart, LineTraceEnd, LeftMouseHitResult.bBlockingHit ? FColor::Blue : FColor::Red, false, 5.0f, 0, 1.0f);
 		//UE_LOG(LogTemp, Log, TEXT("Line Trace Has Hit: %s"), *LeftMouseHitResult.GetActor()->GetName());
 
-		if (Cast<AGrabbableObject>(LeftMouseHitResult.GetActor()))
+		if (Cast<AGrabbableObject>(LeftMouseHitResult.GetActor()) && Cast<AGrabbableObject>(LeftMouseHitResult.GetActor())->bGrabbable)
 		{
 			bPickedUpObject = true;
 			GrabbedObjectReference = Cast<AGrabbableObject>(LeftMouseHitResult.GetActor());
@@ -114,8 +114,10 @@ void APlayerCharacter::LeftMouseInteract()
 				Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			}
 
+
+			UE_LOG(LogTemp, Log, TEXT("hit normal is %s"), *LeftMouseHitResult.ImpactNormal.ToString());
 			GrabbedObjectReference->SetActorLocation(LeftMouseHitResult.ImpactPoint);
-			GrabbedObjectReference->SetActorRotation(LeftMouseHitResult.ImpactNormal.Rotation() * 180);
+			GrabbedObjectReference->SetActorRotation((LeftMouseHitResult.ImpactNormal * -180).Rotation());
 
 			LeftMouseQueryParams.SetNumIgnoredComponents(0);
 			
