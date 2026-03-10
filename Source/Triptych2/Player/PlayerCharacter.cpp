@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Triptych2/Puzzle/PuzzlePin.h"
 #include "Triptych2/Puzzle/PuzzleGridBase.h"
+#include "Triptych2/Alien/AlienCharacter.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -23,7 +24,6 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 
@@ -31,10 +31,11 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Player has %d Points"), Points));
 	if (bPickedUpObject) {
 		FVector GrabbedObjectPos = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * ObjectDistanceFromPlayer;
 		GrabbedObjectReference->SetActorLocation(GrabbedObjectPos);
+
 	}
 }
 
@@ -51,6 +52,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("LeftClick", IE_Pressed, this, &APlayerCharacter::LeftMouseInteract);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerCharacter::DropObject);
+	PlayerInputComponent->BindAction("E", IE_Pressed, this, &APlayerCharacter::EInteract);
 
 }
 
@@ -93,6 +95,7 @@ void APlayerCharacter::LeftMouseInteract()
 		{
 			bPickedUpObject = true;
 			GrabbedObjectReference = Cast<AGrabbableObject>(LeftMouseHitResult.GetActor());
+			EQueryParams.AddIgnoredActor(GrabbedObjectReference);
 
 			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
 				LeftMouseQueryParams.AddIgnoredComponent(Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh);
@@ -115,13 +118,13 @@ void APlayerCharacter::LeftMouseInteract()
 			}
 
 
-			UE_LOG(LogTemp, Log, TEXT("hit normal is %s"), *LeftMouseHitResult.ImpactNormal.ToString());
+			//UE_LOG(LogTemp, Log, TEXT("hit normal is %s"), *LeftMouseHitResult.ImpactNormal.ToString());
 			GrabbedObjectReference->SetActorLocation(LeftMouseHitResult.ImpactPoint);
 			GrabbedObjectReference->SetActorRotation((LeftMouseHitResult.ImpactNormal * -180).Rotation());
 
+			Cast<APuzzleGridBase>(LeftMouseHitResult.GetActor())->PinCheck(GrabbedObjectReference);
 			LeftMouseQueryParams.SetNumIgnoredComponents(0);
 			
-			Cast<APuzzleGridBase>(LeftMouseHitResult.GetActor())->PinCheck();
 			GrabbedObjectReference = nullptr;
 		}
 	}
@@ -137,5 +140,19 @@ void APlayerCharacter::DropObject()
 		LeftMouseQueryParams.SetNumIgnoredComponents(0);
 		GrabbedObjectReference = nullptr;
 		bPickedUpObject = false;
+	}
+}
+
+void APlayerCharacter::EInteract()
+{
+	FHitResult EHitResult;
+	FVector LineTraceStart = PlayerCamera->GetComponentLocation();
+	FVector LineTraceEnd = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * PlayerReach;
+	EQueryParams.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(EHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, EQueryParams);
+
+	if (Cast<AAlienCharacter>(EHitResult.GetActor())) {
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Alien"));
+		Cast<AAlienCharacter>(EHitResult.GetActor())->PlayerInteract(this);
 	}
 }

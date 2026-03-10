@@ -25,6 +25,9 @@ public:
 
 	int32 ObjectDistanceFromPlayer = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Points = 0;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,10 +43,12 @@ protected:
 
 	void LeftMouseInteract();
 	void DropObject();
+	void EInteract();
 
 	bool bPickedUpObject = false;
 
 	FCollisionQueryParams LeftMouseQueryParams;
+	FCollisionQueryParams EQueryParams;
 
 	class AGrabbableObject* GrabbedObjectReference;
 

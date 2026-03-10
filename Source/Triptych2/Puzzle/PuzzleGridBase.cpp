@@ -6,6 +6,8 @@
 #include "Triptych2/Puzzle/PuzzlePin.h"
 #include "Components/TextRenderComponent.h"
 #include "Internationalization/Text.h"
+#include "Triptych2/Player/PlayerCharacter.h"
+#include "Triptych2/Alien/AlienCharacter.h"
 
 // Sets default values
 APuzzleGridBase::APuzzleGridBase()
@@ -14,18 +16,22 @@ APuzzleGridBase::APuzzleGridBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Scene Component"));
-	Plane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Plane"));
+	Map = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Map"));
+	RandomPosition = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RandomPosition"));
 	BigSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Big Sphere"));
 	MediumSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Medium Sphere"));
 	SmallSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Small Sphere"));
 	BoardText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Board Text"));
 
 	RootSceneComponent->SetupAttachment(RootComponent);
-	Plane->SetupAttachment(RootSceneComponent);
+	Map->SetupAttachment(RootSceneComponent);
+	RandomPosition->SetupAttachment(RootSceneComponent);
 	BigSphereCollider->SetupAttachment(RootSceneComponent);
 	MediumSphereCollider->SetupAttachment(BigSphereCollider);
 	SmallSphereCollider->SetupAttachment(BigSphereCollider);
 	BoardText->SetupAttachment(RootSceneComponent);
+
+	RandomPosition->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +40,7 @@ void APuzzleGridBase::BeginPlay()
 	Super::BeginPlay();
 	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoardText->SetText(FText::FromString("Can you guess where this is?"));
+	PlayerRef = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 }
 
 void APuzzleGridBase::Tick(float DeltaTime)
@@ -56,8 +63,6 @@ void APuzzleGridBase::OnBigBeginOverlap(UPrimitiveComponent* OverlappedComp, AAc
 		bPinInBigRange = true;
 	}
 }
-
-
 
 void APuzzleGridBase::OnBigEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
@@ -94,25 +99,31 @@ void APuzzleGridBase::OnSmallEndOverlap(UPrimitiveComponent* OverlappedComp, AAc
 	}
 }
 
-void APuzzleGridBase::PinCheck()
+void APuzzleGridBase::PinCheck(AActor* OtherActor)
 {
-	if (bPinInBigRange) {
-		PinReference->bGrabbable = false;
-	}
+	if (Cast<APuzzlePin>(OtherActor) == PinReference) {
+		if (bPinInBigRange) {
+			PinReference->bGrabbable = false;
+			AlienRef->bPuzzleCompleted = true;
+		}
 
-	if (bPinInSmallRange)
-	{
-		BoardText->SetText(FText::FromString("You are very close!"));
-	}
-	else if (bPinInMediumRange)
-	{
-		BoardText->SetText(FText::FromString("You are close!"));
-	}
-	else if (bPinInBigRange) {
-		BoardText->SetText(FText::FromString("You are far!"));
-	}
-	else
-	{
-		BoardText->SetText(FText::FromString("Keep Trying!"));
+		if (bPinInSmallRange)
+		{
+			BoardText->SetText(FText::FromString("Spot On! You Get 3 Points!"));
+			AlienRef->PointsToAward = 3;
+		}
+		else if (bPinInMediumRange)
+		{
+			BoardText->SetText(FText::FromString("You are very close! You Get 2 Points!"));
+			AlienRef->PointsToAward = 2;
+		}
+		else if (bPinInBigRange) {
+			BoardText->SetText(FText::FromString("You are close! You Get 1 Point!"));
+			AlienRef->PointsToAward = 1;
+		}
+		else
+		{
+			BoardText->SetText(FText::FromString("Keep Trying!"));
+		}
 	}
 }

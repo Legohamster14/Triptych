@@ -22,6 +22,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Reference")
 	class APuzzlePin* PinReference;
 
+	UPROPERTY(EditAnywhere, Category = "Reference")
+	class APlayerCharacter* PlayerRef;
+
+	UPROPERTY(EditAnywhere, Category = "Reference")
+	class AAlienCharacter* AlienRef;
+
 	bool bPinInBigRange = false;
 	bool bPinInMediumRange = false;
 	bool bPinInSmallRange = false;
@@ -30,7 +36,7 @@ public:
 	class UTextRenderComponent* BoardText;
 
 	UFUNCTION()
-	void PinCheck();
+	void PinCheck(AActor* OtherActor);
 
 protected:
 	// Called when the game starts or when spawned
@@ -56,7 +62,9 @@ protected:
 	USceneComponent* RootSceneComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-	UStaticMeshComponent* Plane;
+	UStaticMeshComponent* Map;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	UStaticMeshComponent* RandomPosition;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USphereComponent* BigSphereCollider;
@@ -65,4 +73,5 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USphereComponent* SmallSphereCollider;
 
+	bool bCompleted = false;
 };
