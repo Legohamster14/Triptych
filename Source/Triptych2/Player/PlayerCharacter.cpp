@@ -100,8 +100,15 @@ void APlayerCharacter::LeftMouseInteract()
 			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
 				LeftMouseQueryParams.AddIgnoredComponent(Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh);
 				Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				return;
 			}
 
+		}
+
+		if (Cast<AAlienCharacter>(LeftMouseHitResult.GetActor())) {
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Alien"));
+			Cast<AAlienCharacter>(LeftMouseHitResult.GetActor())->PlayerInteract(this);
+			return;
 		}
 	}
 	else
@@ -145,14 +152,5 @@ void APlayerCharacter::DropObject()
 
 void APlayerCharacter::EInteract()
 {
-	FHitResult EHitResult;
-	FVector LineTraceStart = PlayerCamera->GetComponentLocation();
-	FVector LineTraceEnd = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * PlayerReach;
-	EQueryParams.AddIgnoredActor(this);
-	GetWorld()->LineTraceSingleByChannel(EHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, EQueryParams);
 
-	if (Cast<AAlienCharacter>(EHitResult.GetActor())) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Alien"));
-		Cast<AAlienCharacter>(EHitResult.GetActor())->PlayerInteract(this);
-	}
 }

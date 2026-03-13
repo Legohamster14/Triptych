@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "AlienCharacter.generated.h"
 
+class APuzzlePin;
+
 UCLASS()
 class TRIPTYCH2_API AAlienCharacter : public ACharacter
 {
@@ -28,6 +30,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	int32 PointsToAward = 0;
 
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	TSubclassOf<APuzzlePin> Pin;
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	class APuzzleGridBase* BoardRef;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	class USoundBase* CheerSound;
+
 	bool bPuzzleCompleted = false;
 
 	UFUNCTION()
@@ -42,6 +52,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class UTextRenderComponent* AlienText;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	USceneComponent* PinSpawn;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	class UAudioComponent* AudioComp;
+	bool bPinSpawned = false;
 
 
 	UFUNCTION()
