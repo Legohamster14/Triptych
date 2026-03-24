@@ -32,22 +32,14 @@ APuzzleGridBase::APuzzleGridBase()
 	BoardText->SetupAttachment(RootSceneComponent);
 
 	RandomPosition->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoardText->SetText(FText::FromString("Can you guess where this is?"));
 }
 
 // Called when the game starts or when spawned
 void APuzzleGridBase::BeginPlay()
 {
 	Super::BeginPlay();
-	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	BoardText->SetText(FText::FromString("Can you guess where this is?"));
-	PlayerRef = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-}
-
-void APuzzleGridBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//UE_LOG(LogTemp, Log, TEXT("Pins is in the %s"), (bPinInCorrectPosition ? TEXT("Right spot") : TEXT("Wrong spot")));
 
 	BigSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APuzzleGridBase::OnBigBeginOverlap);
 	BigSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnBigEndOverlap);
@@ -55,6 +47,11 @@ void APuzzleGridBase::Tick(float DeltaTime)
 	MediumSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnMediumEndOverlap);
 	SmallSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallBeginOverlap);
 	SmallSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallEndOverlap);
+}
+
+void APuzzleGridBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void APuzzleGridBase::OnBigBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -93,7 +90,7 @@ void APuzzleGridBase::OnSmallBeginOverlap(UPrimitiveComponent* OverlappedComp, A
 }
 
 void APuzzleGridBase::OnSmallEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
+{	
 	if (Cast<APuzzlePin>(OtherActor) == PinReference) {
 		bPinInSmallRange = false;
 	}
@@ -105,6 +102,11 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 		if (bPinInBigRange) {
 			PinReference->bGrabbable = false;
 			AlienRef->bPuzzleCompleted = true;
+		}
+		else
+		{
+			BoardText->SetText(FText::FromString("Keep Trying!"));
+			return;
 		}
 
 		if (bPinInSmallRange)
@@ -120,10 +122,6 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 		else if (bPinInBigRange) {
 			BoardText->SetText(FText::FromString("You are close! You Get 1 Point!"));
 			AlienRef->PointsToAward = 1;
-		}
-		else
-		{
-			BoardText->SetText(FText::FromString("Keep Trying!"));
 		}
 	}
 }

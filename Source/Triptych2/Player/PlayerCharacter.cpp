@@ -7,6 +7,7 @@
 #include "Triptych2/Puzzle/PuzzlePin.h"
 #include "Triptych2/Puzzle/PuzzleGridBase.h"
 #include "Triptych2/Alien/AlienCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -24,6 +25,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	LeftMouseQueryParams.AddIgnoredActor(this);
 }
 
 
@@ -31,10 +33,12 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Player has %d Points"), Points));
+
+	//Set the position of the carried object in front of the player
 	if (bPickedUpObject) {
 		FVector GrabbedObjectPos = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * ObjectDistanceFromPlayer;
 		GrabbedObjectReference->SetActorLocation(GrabbedObjectPos);
+		GrabbedObjectReference->SetActorRotation(PlayerCamera->GetComponentQuat());
 
 	}
 }
@@ -46,6 +50,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &APlayerCharacter::EndSprint);
 
 	PlayerInputComponent->BindAxis("CameraYaw", this, &APlayerCharacter::CameraYaw);
 	PlayerInputComponent->BindAxis("CamerPitch", this, &APlayerCharacter::CamerPitch);
@@ -68,6 +75,16 @@ void APlayerCharacter::MoveRight(float InputValue)
 	AddMovementInput(rightVector, InputValue);
 }
 
+void APlayerCharacter::StartSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+}
+
+void APlayerCharacter::EndSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+}
+
 void APlayerCharacter::CameraYaw(float InputValue)
 {
 	AddControllerYawInput(InputValue);
@@ -80,22 +97,20 @@ void APlayerCharacter::CamerPitch(float InputValue)
 
 void APlayerCharacter::LeftMouseInteract()
 {
-	//UE_LOG(LogTemp, Log, TEXT("has player picked up an object %s"), (bPickedUpObject ? TEXT("True") : TEXT("False")));
+	//Sets up variables for line trace
 	FHitResult LeftMouseHitResult;
 	FVector LineTraceStart = PlayerCamera->GetComponentLocation();
 	FVector LineTraceEnd = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * PlayerReach;
-	LeftMouseQueryParams.AddIgnoredActor(this);
 
+	
 	if (!bPickedUpObject) {
 		GetWorld()->LineTraceSingleByChannel(LeftMouseHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, LeftMouseQueryParams);
-		//DrawDebugLine(GetWorld(), LineTraceStart, LineTraceEnd, LeftMouseHitResult.bBlockingHit ? FColor::Blue : FColor::Red, false, 5.0f, 0, 1.0f);
-		//UE_LOG(LogTemp, Log, TEXT("Line Trace Has Hit: %s"), *LeftMouseHitResult.GetActor()->GetName());
 
+		//Checks if the player is interacting with a grabbable object
 		if (Cast<AGrabbableObject>(LeftMouseHitResult.GetActor()) && Cast<AGrabbableObject>(LeftMouseHitResult.GetActor())->bGrabbable)
 		{
 			bPickedUpObject = true;
 			GrabbedObjectReference = Cast<AGrabbableObject>(LeftMouseHitResult.GetActor());
-			EQueryParams.AddIgnoredActor(GrabbedObjectReference);
 
 			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
 				LeftMouseQueryParams.AddIgnoredComponent(Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh);
@@ -105,8 +120,8 @@ void APlayerCharacter::LeftMouseInteract()
 
 		}
 
+		//Checks if the player is interacting with an alien
 		if (Cast<AAlienCharacter>(LeftMouseHitResult.GetActor())) {
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, TEXT("Alien"));
 			Cast<AAlienCharacter>(LeftMouseHitResult.GetActor())->PlayerInteract(this);
 			return;
 		}
@@ -114,9 +129,8 @@ void APlayerCharacter::LeftMouseInteract()
 	else
 	{
 		GetWorld()->LineTraceSingleByChannel(LeftMouseHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, LeftMouseQueryParams);
-		//DrawDebugLine(GetWorld(), LineTraceStart, LineTraceEnd, LeftMouseHitResult.bBlockingHit ? FColor::Blue : FColor::Red, false, 5.0f, 0, 1.0f);
-		//UE_LOG(LogTemp, Log, TEXT("Line Trace Has Hit: %s"), *LeftMouseHitResult.GetActor()->GetName());
 
+		//Checks if the player is interacting with a puzzle board
 		if (Cast<APuzzleGridBase>(LeftMouseHitResult.GetActor()))
 		{
 			bPickedUpObject = false;
@@ -124,8 +138,6 @@ void APlayerCharacter::LeftMouseInteract()
 				Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			}
 
-
-			//UE_LOG(LogTemp, Log, TEXT("hit normal is %s"), *LeftMouseHitResult.ImpactNormal.ToString());
 			GrabbedObjectReference->SetActorLocation(LeftMouseHitResult.ImpactPoint);
 			GrabbedObjectReference->SetActorRotation((LeftMouseHitResult.ImpactNormal * -180).Rotation());
 
@@ -137,6 +149,7 @@ void APlayerCharacter::LeftMouseInteract()
 	}
 }
 
+//Stop the player from carrying an object
 void APlayerCharacter::DropObject()
 {
 	if (bPickedUpObject)

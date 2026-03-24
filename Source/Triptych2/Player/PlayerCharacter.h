@@ -21,8 +21,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, Category = "Interaction")
 	int32 PlayerReach = 500;
 
+	UPROPERTY(EditAnywhere, Category = "Interaction")
 	int32 ObjectDistanceFromPlayer = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -37,6 +39,8 @@ protected:
 
 	void MoveForward(float InputValue);
 	void MoveRight(float InputValue);
+	void StartSprint();
+	void EndSprint();
 
 	void CameraYaw(float InputValue);
 	void CamerPitch(float InputValue);
@@ -48,7 +52,6 @@ protected:
 	bool bPickedUpObject = false;
 
 	FCollisionQueryParams LeftMouseQueryParams;
-	FCollisionQueryParams EQueryParams;
 
 	class AGrabbableObject* GrabbedObjectReference;
 

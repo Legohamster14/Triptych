@@ -25,6 +25,7 @@ AAlienCharacter::AAlienCharacter()
 	AlienText->SetupAttachment(RootComponent);
 	PinSpawn->SetupAttachment(RootComponent);
 	AudioComp->SetupAttachment(RootComponent);
+
 }
 
 
@@ -38,7 +39,6 @@ void AAlienCharacter::BeginPlay()
 	
 	InteractArea->OnComponentBeginOverlap.AddDynamic(this, &AAlienCharacter::OnInterctAreaBeginOverlap);
 	InteractArea->OnComponentEndOverlap.AddDynamic(this, &AAlienCharacter::OnInteractAreaEndOverlap);
-	
 }
 
 
@@ -58,6 +58,7 @@ void AAlienCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAlienCharacter::PlayerInteract(APlayerCharacter* Player)
 {
+	//
 	if (!bPuzzleCompleted) {
 		if (!bPinSpawned) {
 			AlienChatIndex = 1;
@@ -68,12 +69,13 @@ void AAlienCharacter::PlayerInteract(APlayerCharacter* Player)
 			bPinSpawned = true;
 		}
 	}
-	else
+	else if (bGivenPoints == false)
 	{
 		AlienChatIndex = 2;
 		AlienText->SetText(FText::FromString(AlienChatStrings[AlienChatIndex]));
 		Player->Points += PointsToAward;
 		UGameplayStatics::PlaySound2D(this, CheerSound);
+		bGivenPoints = true;
 	}
 }
 

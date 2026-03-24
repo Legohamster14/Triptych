@@ -58,7 +58,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	class UAudioComponent* AudioComp;
+
 	bool bPinSpawned = false;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	bool bGivenPoints = false;
 
 
 	UFUNCTION()
