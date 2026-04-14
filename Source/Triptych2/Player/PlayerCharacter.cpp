@@ -77,12 +77,12 @@ void APlayerCharacter::MoveRight(float InputValue)
 
 void APlayerCharacter::StartSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
 void APlayerCharacter::EndSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void APlayerCharacter::CameraYaw(float InputValue)
