@@ -12,11 +12,9 @@ APuzzlePin::APuzzlePin()
 
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	PinMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pin Mesh"));
-	Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 
 	RootSceneComponent->SetupAttachment(RootComponent);
 	PinMesh->SetupAttachment(RootSceneComponent);
-	Collider->SetupAttachment(RootSceneComponent);
 
 }
 

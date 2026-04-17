@@ -8,6 +8,7 @@
 #include "Internationalization/Text.h"
 #include "Triptych2/Player/PlayerCharacter.h"
 #include "Triptych2/Alien/AlienCharacter.h"
+#include "Components/SceneCaptureComponent2D.h"
 
 // Sets default values
 APuzzleGridBase::APuzzleGridBase()
@@ -22,6 +23,7 @@ APuzzleGridBase::APuzzleGridBase()
 	MediumSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Medium Sphere"));
 	SmallSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Small Sphere"));
 	BoardText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Board Text"));
+	PuzzleCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Puzzle Camera"));
 
 	RootSceneComponent->SetupAttachment(RootComponent);
 	Map->SetupAttachment(RootSceneComponent);
@@ -30,6 +32,7 @@ APuzzleGridBase::APuzzleGridBase()
 	MediumSphereCollider->SetupAttachment(BigSphereCollider);
 	SmallSphereCollider->SetupAttachment(BigSphereCollider);
 	BoardText->SetupAttachment(RootSceneComponent);
+	PuzzleCamera->SetupAttachment(RootSceneComponent);
 
 	RandomPosition->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);

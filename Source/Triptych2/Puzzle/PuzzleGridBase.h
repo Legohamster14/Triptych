@@ -73,5 +73,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USphereComponent* SmallSphereCollider;
 
+	UPROPERTY(EditAnywhere, Category = "Components")
+	class USceneCaptureComponent* PuzzleCamera;
+
 	bool bCompleted = false;
 };

@@ -21,9 +21,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UStaticMeshComponent* PinMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Components")
-	class USphereComponent* Collider;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

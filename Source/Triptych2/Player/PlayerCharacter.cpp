@@ -114,7 +114,6 @@ void APlayerCharacter::LeftMouseInteract()
 
 			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
 				LeftMouseQueryParams.AddIgnoredComponent(Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh);
-				Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				return;
 			}
 
@@ -134,9 +133,6 @@ void APlayerCharacter::LeftMouseInteract()
 		if (Cast<APuzzleGridBase>(LeftMouseHitResult.GetActor()))
 		{
 			bPickedUpObject = false;
-			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
-				Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			}
 
 			GrabbedObjectReference->SetActorLocation(LeftMouseHitResult.ImpactPoint);
 			GrabbedObjectReference->SetActorRotation((LeftMouseHitResult.ImpactNormal * -180).Rotation());
@@ -154,9 +150,6 @@ void APlayerCharacter::DropObject()
 {
 	if (bPickedUpObject)
 	{
-		if (Cast<APuzzlePin>(GrabbedObjectReference)) {
-			Cast<APuzzlePin>(GrabbedObjectReference)->Collider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		}
 		LeftMouseQueryParams.SetNumIgnoredComponents(0);
 		GrabbedObjectReference = nullptr;
 		bPickedUpObject = false;
