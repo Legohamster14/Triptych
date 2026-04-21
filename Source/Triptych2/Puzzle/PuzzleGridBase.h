@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PuzzleGridBase.generated.h"
 
+class USceneCaptureComponent2D;
 class USphereComponent;
 
 UCLASS()
@@ -28,6 +29,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Reference")
 	class AAlienCharacter* AlienRef;
 
+	UPROPERTY(EditAnywhere, Category = "Reference")
+	class AActor* LandscapeRef;
+
+	UPROPERTY(EditAnywhere, Category = "Puzzle")
+	float Scale = 282.3f;
+
 	bool bPinInBigRange = false;
 	bool bPinInMediumRange = false;
 	bool bPinInSmallRange = false;
@@ -37,6 +44,9 @@ public:
 
 	UFUNCTION()
 	void PinCheck(AActor* OtherActor);
+
+	UFUNCTION()
+	void SceneCaptureTest();
 
 protected:
 	// Called when the game starts or when spawned
@@ -58,6 +68,7 @@ protected:
 	void OnSmallEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
+
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USceneComponent* RootSceneComponent;
 
@@ -74,7 +85,7 @@ protected:
 	USphereComponent* SmallSphereCollider;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-	class USceneCaptureComponent* PuzzleCamera;
+	USceneCaptureComponent2D* PuzzleCamera;
 
 	bool bCompleted = false;
 };

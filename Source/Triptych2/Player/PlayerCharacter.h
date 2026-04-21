@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UMaterialInstance;
+
 UCLASS()
 class TRIPTYCH2_API APlayerCharacter : public ACharacter
 {
@@ -35,6 +37,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	int32 WalkSpeed = 600;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	UMaterialInstance* OpaquePinMat;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	UMaterialInstance* TransarentPinMat;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,6 +64,7 @@ protected:
 	bool bPickedUpObject = false;
 
 	FCollisionQueryParams LeftMouseQueryParams;
+	FCollisionQueryParams EQueryParams;
 
 	class AGrabbableObject* GrabbedObjectReference;
 

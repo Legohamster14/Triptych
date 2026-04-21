@@ -9,6 +9,7 @@
 #include "Triptych2/Player/PlayerCharacter.h"
 #include "Triptych2/Alien/AlienCharacter.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Materials/MaterialInstance.h"
 
 // Sets default values
 APuzzleGridBase::APuzzleGridBase()
@@ -24,6 +25,7 @@ APuzzleGridBase::APuzzleGridBase()
 	SmallSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Small Sphere"));
 	BoardText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Board Text"));
 	PuzzleCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Puzzle Camera"));
+	
 
 	RootSceneComponent->SetupAttachment(RootComponent);
 	Map->SetupAttachment(RootSceneComponent);
@@ -32,11 +34,11 @@ APuzzleGridBase::APuzzleGridBase()
 	MediumSphereCollider->SetupAttachment(BigSphereCollider);
 	SmallSphereCollider->SetupAttachment(BigSphereCollider);
 	BoardText->SetupAttachment(RootSceneComponent);
-	PuzzleCamera->SetupAttachment(RootSceneComponent);
 
 	RandomPosition->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoardText->SetText(FText::FromString("Can you guess where this is?"));
+	PuzzleCamera->bCaptureEveryFrame = false;
 }
 
 // Called when the game starts or when spawned
@@ -50,11 +52,21 @@ void APuzzleGridBase::BeginPlay()
 	MediumSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnMediumEndOverlap);
 	SmallSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallBeginOverlap);
 	SmallSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallEndOverlap);
+
+	PuzzleCamera->CaptureScene();
+	PuzzleCamera->DestroyComponent();
+
+	FVector LandscapeRefLoc = LandscapeRef->GetActorLocation();
+	float Xdist = (LandscapeRefLoc.X - PuzzleCamera->GetComponentLocation().X) / Scale;
+	float Ydist = (LandscapeRefLoc.Y - PuzzleCamera->GetComponentLocation().Y) / Scale;
+
+	BigSphereCollider->SetRelativeLocation(FVector(Xdist, Ydist, 0));
 }
 
 void APuzzleGridBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void APuzzleGridBase::OnBigBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -99,6 +111,7 @@ void APuzzleGridBase::OnSmallEndOverlap(UPrimitiveComponent* OverlappedComp, AAc
 	}
 }
 
+
 void APuzzleGridBase::PinCheck(AActor* OtherActor)
 {
 	if (Cast<APuzzlePin>(OtherActor) == PinReference) {
@@ -127,4 +140,10 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 			AlienRef->PointsToAward = 1;
 		}
 	}
+}
+
+void APuzzleGridBase::SceneCaptureTest()
+{
+	UE_LOG(LogTemp, Display, TEXT("Capture Scene"));
+	PuzzleCamera->CaptureScene();
 }

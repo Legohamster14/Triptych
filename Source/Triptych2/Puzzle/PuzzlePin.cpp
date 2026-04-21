@@ -22,6 +22,8 @@ APuzzlePin::APuzzlePin()
 void APuzzlePin::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PinMesh->SetMaterial(0, PinMat);
 	
 }
 

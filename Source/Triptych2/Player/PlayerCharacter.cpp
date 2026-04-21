@@ -26,6 +26,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	LeftMouseQueryParams.AddIgnoredActor(this);
+	EQueryParams.AddIgnoredActor(this);
 }
 
 
@@ -111,6 +112,7 @@ void APlayerCharacter::LeftMouseInteract()
 		{
 			bPickedUpObject = true;
 			GrabbedObjectReference = Cast<AGrabbableObject>(LeftMouseHitResult.GetActor());
+			Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh->SetMaterial(0, TransarentPinMat);
 
 			if (Cast<APuzzlePin>(GrabbedObjectReference)) {
 				LeftMouseQueryParams.AddIgnoredComponent(Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh);
@@ -133,7 +135,7 @@ void APlayerCharacter::LeftMouseInteract()
 		if (Cast<APuzzleGridBase>(LeftMouseHitResult.GetActor()))
 		{
 			bPickedUpObject = false;
-
+			Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh->SetMaterial(0, OpaquePinMat);
 			GrabbedObjectReference->SetActorLocation(LeftMouseHitResult.ImpactPoint);
 			GrabbedObjectReference->SetActorRotation((LeftMouseHitResult.ImpactNormal * -180).Rotation());
 
@@ -150,6 +152,7 @@ void APlayerCharacter::DropObject()
 {
 	if (bPickedUpObject)
 	{
+		Cast<APuzzlePin>(GrabbedObjectReference)->PinMesh->SetMaterial(0, OpaquePinMat);
 		LeftMouseQueryParams.SetNumIgnoredComponents(0);
 		GrabbedObjectReference = nullptr;
 		bPickedUpObject = false;
@@ -158,5 +161,14 @@ void APlayerCharacter::DropObject()
 
 void APlayerCharacter::EInteract()
 {
+	FHitResult EHitResult;
+	FVector LineTraceStart = PlayerCamera->GetComponentLocation();
+	FVector LineTraceEnd = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * PlayerReach;
+
+	GetWorld()->LineTraceSingleByChannel(EHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, EQueryParams);
+
+	if (Cast<APuzzleGridBase>(EHitResult.GetActor())) {
+		Cast<APuzzleGridBase>(EHitResult.GetActor())->SceneCaptureTest();
+	}
 
 }

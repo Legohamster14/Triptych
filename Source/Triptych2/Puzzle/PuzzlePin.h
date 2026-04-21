@@ -7,6 +7,8 @@
 #include "Triptych2/Puzzle/GrabbableObject.h"
 #include "PuzzlePin.generated.h"
 
+class UMaterialInstance;
+
 UCLASS()
 class TRIPTYCH2_API APuzzlePin : public AGrabbableObject
 {
@@ -20,6 +22,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UStaticMeshComponent* PinMesh;
+	UPROPERTY(EditAnywhere, Category = "Material")
+	UMaterialInstance* PinMat;
 
 protected:
 	// Called when the game starts or when spawned
