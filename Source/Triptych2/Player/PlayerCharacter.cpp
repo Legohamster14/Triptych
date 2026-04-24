@@ -57,6 +57,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAxis("CameraYaw", this, &APlayerCharacter::CameraYaw);
 	PlayerInputComponent->BindAxis("CamerPitch", this, &APlayerCharacter::CamerPitch);
+	PlayerInputComponent->BindAxis("Zoom", this, &APlayerCharacter::CameraZoom);
+	PlayerInputComponent->BindAction("ResetZoom", IE_Pressed, this, &APlayerCharacter::ResetZoom);
+	PlayerInputComponent->BindAction("QZoom", IE_Pressed, this, &APlayerCharacter::QZoomIn);
+	PlayerInputComponent->BindAction("QZoom", IE_Released, this, &APlayerCharacter::QZoomOut);
 
 	PlayerInputComponent->BindAction("LeftClick", IE_Pressed, this, &APlayerCharacter::LeftMouseInteract);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerCharacter::DropObject);
@@ -94,6 +98,34 @@ void APlayerCharacter::CameraYaw(float InputValue)
 void APlayerCharacter::CamerPitch(float InputValue)
 {
 	AddControllerPitchInput(InputValue);
+}
+
+void APlayerCharacter::CameraZoom(float InputValue)
+{
+	PlayerCamera->FieldOfView -= InputValue * 2;
+	if (PlayerCamera->FieldOfView > 120)
+	{
+		PlayerCamera->FieldOfView = 120;
+	}
+	else if (PlayerCamera->FieldOfView < 20) 
+	{
+		PlayerCamera->FieldOfView = 20;
+	}
+}
+
+void APlayerCharacter::ResetZoom()
+{
+	PlayerCamera->FieldOfView = DefaultZoom;
+}
+
+void APlayerCharacter::QZoomIn()
+{
+	PlayerCamera->FieldOfView = QZoomInAmount;
+}
+
+void APlayerCharacter::QZoomOut()
+{
+	PlayerCamera->FieldOfView = DefaultZoom;
 }
 
 void APlayerCharacter::LeftMouseInteract()
@@ -161,14 +193,5 @@ void APlayerCharacter::DropObject()
 
 void APlayerCharacter::EInteract()
 {
-	FHitResult EHitResult;
-	FVector LineTraceStart = PlayerCamera->GetComponentLocation();
-	FVector LineTraceEnd = PlayerCamera->GetComponentLocation() + PlayerCamera->GetForwardVector() * PlayerReach;
-
-	GetWorld()->LineTraceSingleByChannel(EHitResult, LineTraceStart, LineTraceEnd, ECollisionChannel::ECC_Camera, EQueryParams);
-
-	if (Cast<APuzzleGridBase>(EHitResult.GetActor())) {
-		Cast<APuzzleGridBase>(EHitResult.GetActor())->SceneCaptureTest();
-	}
 
 }

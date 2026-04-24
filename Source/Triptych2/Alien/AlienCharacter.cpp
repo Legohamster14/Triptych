@@ -16,16 +16,15 @@ AAlienCharacter::AAlienCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	InteractArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Interact Area"));
 	AlienText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Alien Text"));
 	PinSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Pin Spawn"));
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	FacePlane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Face Plane"));
 
-	InteractArea->SetupAttachment(RootComponent);
 	AlienText->SetupAttachment(RootComponent);
 	PinSpawn->SetupAttachment(RootComponent);
 	AudioComp->SetupAttachment(RootComponent);
-
+	FacePlane->SetupAttachment(RootComponent);
 }
 
 
@@ -36,9 +35,7 @@ void AAlienCharacter::BeginPlay()
 
 	AlienChatIndex = 0;
 	AlienText->SetText(FText::FromString(AlienChatStrings[AlienChatIndex]));
-	
-	InteractArea->OnComponentBeginOverlap.AddDynamic(this, &AAlienCharacter::OnInterctAreaBeginOverlap);
-	InteractArea->OnComponentEndOverlap.AddDynamic(this, &AAlienCharacter::OnInteractAreaEndOverlap);
+	FacePlane->SetMaterial(0, FacialExpressions[1]);
 }
 
 
@@ -63,6 +60,7 @@ void AAlienCharacter::PlayerInteract(APlayerCharacter* Player)
 		if (!bPinSpawned) {
 			AlienChatIndex = 1;
 			AlienText->SetText(FText::FromString(AlienChatStrings[AlienChatIndex]));
+			ChangeFacialExpression(EFacialExpression::Questioning);
 			APuzzlePin* SpawnedPin = this->GetWorld()->SpawnActor<APuzzlePin>(Pin);
 			SpawnedPin->SetActorLocation(PinSpawn->GetComponentLocation());
 			BoardRef->PinReference = SpawnedPin;
@@ -79,10 +77,31 @@ void AAlienCharacter::PlayerInteract(APlayerCharacter* Player)
 	}
 }
 
-void AAlienCharacter::OnInterctAreaBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AAlienCharacter::ChangeFacialExpression(EFacialExpression FacialExpression)
 {
-}
-
-void AAlienCharacter::OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
+	//UE_LOG(LogTemp, Display, TEXT("Change Facial expression"));
+	switch (FacialExpression)
+	{
+	case EFacialExpression::Sad:
+		//UE_LOG(LogTemp, Display, TEXT("Change Facial expression to sad"));
+		FacePlane->SetMaterial(0, FacialExpressions[0]);
+		break;
+	case EFacialExpression::Neutral:
+		FacePlane->SetMaterial(0, FacialExpressions[1]);
+		break;
+	case EFacialExpression::Happy1:
+		FacePlane->SetMaterial(0, FacialExpressions[2]);
+		break;
+	case EFacialExpression::Happy2:
+		FacePlane->SetMaterial(0, FacialExpressions[3]);
+		break;
+	case EFacialExpression::Happy3:
+		FacePlane->SetMaterial(0, FacialExpressions[4]);
+		break;
+	case EFacialExpression::Questioning:
+		FacePlane->SetMaterial(0, FacialExpressions[5]);
+		break;
+	default:
+		break;
+	}
 }

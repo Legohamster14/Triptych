@@ -42,6 +42,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 	UMaterialInstance* TransarentPinMat;
 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	int32 DefaultZoom = 90;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	int32 QZoomInAmount = 40;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,6 +61,10 @@ protected:
 
 	void CameraYaw(float InputValue);
 	void CamerPitch(float InputValue);
+	void CameraZoom(float InputValue);
+	void ResetZoom();
+	void QZoomIn();
+	void QZoomOut();
 
 	void LeftMouseInteract();
 	void DropObject();

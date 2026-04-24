@@ -10,6 +10,7 @@
 #include "Triptych2/Alien/AlienCharacter.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Materials/MaterialInstance.h"
+#include "Triptych2/Player/TriptychGameInstance.h"
 
 // Sets default values
 APuzzleGridBase::APuzzleGridBase()
@@ -45,6 +46,9 @@ APuzzleGridBase::APuzzleGridBase()
 void APuzzleGridBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TriptychGI = Cast<UTriptychGameInstance>(GetGameInstance());
+	TriptychGI->TotalPuzzles++;
 
 	BigSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APuzzleGridBase::OnBigBeginOverlap);
 	BigSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnBigEndOverlap);
@@ -118,32 +122,31 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 		if (bPinInBigRange) {
 			PinReference->bGrabbable = false;
 			AlienRef->bPuzzleCompleted = true;
+			TriptychGI->CompletedPuzzles++;
 		}
 		else
 		{
 			BoardText->SetText(FText::FromString("Keep Trying!"));
+			AlienRef->ChangeFacialExpression(EFacialExpression::Sad);
 			return;
 		}
 
 		if (bPinInSmallRange)
 		{
-			BoardText->SetText(FText::FromString("Spot On! You Get 3 Points!"));
+			BoardText->SetText(FText::FromString("Spot On! Talk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 3;
+			AlienRef->ChangeFacialExpression(EFacialExpression::Happy3);
 		}
 		else if (bPinInMediumRange)
 		{
-			BoardText->SetText(FText::FromString("You are very close! You Get 2 Points!"));
+			BoardText->SetText(FText::FromString("You are very close! Talk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 2;
+			AlienRef->ChangeFacialExpression(EFacialExpression::Happy2);
 		}
 		else if (bPinInBigRange) {
-			BoardText->SetText(FText::FromString("You are close! You Get 1 Point!"));
+			BoardText->SetText(FText::FromString("You are close! Talk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 1;
+			AlienRef->ChangeFacialExpression(EFacialExpression::Happy1);
 		}
 	}
-}
-
-void APuzzleGridBase::SceneCaptureTest()
-{
-	UE_LOG(LogTemp, Display, TEXT("Capture Scene"));
-	PuzzleCamera->CaptureScene();
 }

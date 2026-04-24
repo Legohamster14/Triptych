@@ -8,6 +8,7 @@
 
 class USceneCaptureComponent2D;
 class USphereComponent;
+class UTriptychGameInstance;
 
 UCLASS()
 class TRIPTYCH2_API APuzzleGridBase : public AActor
@@ -33,7 +34,7 @@ public:
 	class AActor* LandscapeRef;
 
 	UPROPERTY(EditAnywhere, Category = "Puzzle")
-	float Scale = 282.3f;
+	float Scale = 201.6f;
 
 	bool bPinInBigRange = false;
 	bool bPinInMediumRange = false;
@@ -44,9 +45,6 @@ public:
 
 	UFUNCTION()
 	void PinCheck(AActor* OtherActor);
-
-	UFUNCTION()
-	void SceneCaptureTest();
 
 protected:
 	// Called when the game starts or when spawned
@@ -88,4 +86,7 @@ protected:
 	USceneCaptureComponent2D* PuzzleCamera;
 
 	bool bCompleted = false;
+
+	UPROPERTY(EditAnywhere, Category = "GameInstance")
+	UTriptychGameInstance* TriptychGI;
 };

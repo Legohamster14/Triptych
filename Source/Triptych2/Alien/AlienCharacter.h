@@ -7,6 +7,13 @@
 #include "AlienCharacter.generated.h"
 
 class APuzzlePin;
+class UMaterial;
+
+UENUM()
+enum class EFacialExpression : uint8
+{
+	Sad, Neutral, Happy1, Happy2, Happy3, Questioning
+};
 
 UCLASS()
 class TRIPTYCH2_API AAlienCharacter : public ACharacter
@@ -38,17 +45,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	class USoundBase* CheerSound;
 
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	TArray<UMaterial*> FacialExpressions;
+
 	bool bPuzzleCompleted = false;
 
 	UFUNCTION()
 	void PlayerInteract(class APlayerCharacter* Player);
 
+	UFUNCTION()
+	void ChangeFacialExpression(EFacialExpression FacialExpression);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	class UBoxComponent* InteractArea;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class UTextRenderComponent* AlienText;
@@ -56,17 +66,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USceneComponent* PinSpawn;
 
-	UPROPERTY(EditAnywhere, Category = "Interaction")
+	UPROPERTY(EditAnywhere, Category = "Components")
 	class UAudioComponent* AudioComp;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	UStaticMeshComponent* FacePlane;
 
 	bool bPinSpawned = false;
 
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bGivenPoints = false;
 
-
-	UFUNCTION()
-	void OnInterctAreaBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void OnInteractAreaEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
