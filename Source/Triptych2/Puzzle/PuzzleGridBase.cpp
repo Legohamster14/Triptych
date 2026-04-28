@@ -26,6 +26,7 @@ APuzzleGridBase::APuzzleGridBase()
 	SmallSphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Small Sphere"));
 	BoardText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Board Text"));
 	PuzzleCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Puzzle Camera"));
+	Checkmark = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Checkmark"));
 	
 
 	RootSceneComponent->SetupAttachment(RootComponent);
@@ -35,6 +36,7 @@ APuzzleGridBase::APuzzleGridBase()
 	MediumSphereCollider->SetupAttachment(BigSphereCollider);
 	SmallSphereCollider->SetupAttachment(BigSphereCollider);
 	BoardText->SetupAttachment(RootSceneComponent);
+	Checkmark->SetupAttachment(Map);
 
 	RandomPosition->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoardText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -56,6 +58,8 @@ void APuzzleGridBase::BeginPlay()
 	MediumSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnMediumEndOverlap);
 	SmallSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallBeginOverlap);
 	SmallSphereCollider->OnComponentEndOverlap.AddDynamic(this, &APuzzleGridBase::OnSmallEndOverlap);
+
+	Checkmark->SetHiddenInGame(true);
 
 	PuzzleCamera->CaptureScene();
 	PuzzleCamera->DestroyComponent();
@@ -123,6 +127,7 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 			PinReference->bGrabbable = false;
 			AlienRef->bPuzzleCompleted = true;
 			TriptychGI->CompletedPuzzles++;
+			Checkmark->SetHiddenInGame(false);
 		}
 		else
 		{
@@ -133,18 +138,18 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 
 		if (bPinInSmallRange)
 		{
-			BoardText->SetText(FText::FromString("Spot On! Talk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString("Spot On! \nTalk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 3;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy3);
 		}
 		else if (bPinInMediumRange)
 		{
-			BoardText->SetText(FText::FromString("You are very close! Talk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString("You are very close! \nTalk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 2;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy2);
 		}
 		else if (bPinInBigRange) {
-			BoardText->SetText(FText::FromString("You are close! Talk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString("You are close! \nTalk with the alien again to get your points!"));
 			AlienRef->PointsToAward = 1;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy1);
 		}

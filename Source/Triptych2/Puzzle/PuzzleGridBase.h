@@ -74,6 +74,8 @@ protected:
 	UStaticMeshComponent* Map;
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UStaticMeshComponent* RandomPosition;
+	UPROPERTY(EditAnywhere, Category = "Components")
+	UStaticMeshComponent* Checkmark;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USphereComponent* BigSphereCollider;
