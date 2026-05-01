@@ -126,30 +126,34 @@ void APuzzleGridBase::PinCheck(AActor* OtherActor)
 		if (bPinInBigRange) {
 			PinReference->bGrabbable = false;
 			AlienRef->bPuzzleCompleted = true;
-			TriptychGI->CompletedPuzzles++;
+			//TriptychGI->CompletedPuzzles++;
 			Checkmark->SetHiddenInGame(false);
 		}
 		else
 		{
-			BoardText->SetText(FText::FromString("Keep Trying!"));
+			//BoardText->SetText(FText::FromString("Keep Trying!"));
+			BoardText->SetText(FText::FromString(PuzzleStrings[0]));
 			AlienRef->ChangeFacialExpression(EFacialExpression::Sad);
 			return;
 		}
 
 		if (bPinInSmallRange)
 		{
-			BoardText->SetText(FText::FromString("Spot On! \nTalk with the alien again to get your points!"));
+			//BoardText->SetText(FText::FromString("Spot On! \nTalk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString(PuzzleStrings[1]));
 			AlienRef->PointsToAward = 3;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy3);
 		}
 		else if (bPinInMediumRange)
 		{
-			BoardText->SetText(FText::FromString("You are very close! \nTalk with the alien again to get your points!"));
+			//BoardText->SetText(FText::FromString("You are very close! \nTalk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString(PuzzleStrings[2]));
 			AlienRef->PointsToAward = 2;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy2);
 		}
 		else if (bPinInBigRange) {
-			BoardText->SetText(FText::FromString("You are close! \nTalk with the alien again to get your points!"));
+			//BoardText->SetText(FText::FromString("You are close! \nTalk with the alien again to get your points!"));
+			BoardText->SetText(FText::FromString(PuzzleStrings[3]));
 			AlienRef->PointsToAward = 1;
 			AlienRef->ChangeFacialExpression(EFacialExpression::Happy1);
 		}

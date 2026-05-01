@@ -89,6 +89,9 @@ protected:
 
 	bool bCompleted = false;
 
-	UPROPERTY(EditAnywhere, Category = "GameInstance")
+	UPROPERTY(EditAnywhere, Category = "Puzzle")
+	TArray<FString> PuzzleStrings;
+
+	UPROPERTY(EditAnywhere, Category = "GameInstance", meta = (MultiLine = "true"))
 	UTriptychGameInstance* TriptychGI;
 };

@@ -9,6 +9,7 @@
 #include "Triptych2/Puzzle/PuzzlePin.h"
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Triptych2/Player/TriptychGameInstance.h"
 
 // Sets default values
 AAlienCharacter::AAlienCharacter()
@@ -36,8 +37,9 @@ void AAlienCharacter::BeginPlay()
 	AlienChatIndex = 0;
 	AlienText->SetText(FText::FromString(AlienChatStrings[AlienChatIndex]));
 	FacePlane->SetMaterial(0, FacialExpressions[1]);
-}
 
+	TriptychGI = Cast<UTriptychGameInstance>(GetGameInstance());
+}
 
 // Called every frame
 void AAlienCharacter::Tick(float DeltaTime)
@@ -69,7 +71,8 @@ void AAlienCharacter::PlayerInteract(APlayerCharacter* Player)
 	}
 	else if (bGivenPoints == false)
 	{
-		AlienChatIndex = 2;
+		//AlienChatIndex = 2;
+		TriptychGI->CompletedPuzzles++;
 		AlienText->SetText(FText::FromString(AlienChatStrings[AlienChatIndex]));
 		Player->Points += PointsToAward;
 		UGameplayStatics::PlaySound2D(this, CheerSound);
@@ -91,12 +94,15 @@ void AAlienCharacter::ChangeFacialExpression(EFacialExpression FacialExpression)
 		break;
 	case EFacialExpression::Happy1:
 		FacePlane->SetMaterial(0, FacialExpressions[2]);
+		AlienChatIndex = 2;
 		break;
 	case EFacialExpression::Happy2:
 		FacePlane->SetMaterial(0, FacialExpressions[3]);
+		AlienChatIndex = 3;
 		break;
 	case EFacialExpression::Happy3:
 		FacePlane->SetMaterial(0, FacialExpressions[4]);
+		AlienChatIndex = 4;
 		break;
 	case EFacialExpression::Questioning:
 		FacePlane->SetMaterial(0, FacialExpressions[5]);

@@ -76,4 +76,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bGivenPoints = false;
 
+	UPROPERTY(EditAnywhere, Category = "Game Instance")
+	class UTriptychGameInstance* TriptychGI;
+
 };
