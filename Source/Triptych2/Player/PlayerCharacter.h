@@ -7,6 +7,7 @@
 #include "PlayerCharacter.generated.h"
 
 class UMaterialInstance;
+class UTriptychGameInstance;
 
 UCLASS()
 class TRIPTYCH2_API APlayerCharacter : public ACharacter
@@ -47,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	int32 QZoomInAmount = 40;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	FString CurrentPlayerName;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,6 +73,7 @@ protected:
 	void LeftMouseInteract();
 	void DropObject();
 	void EInteract();
+	void ResetLevel();
 
 	bool bPickedUpObject = false;
 
@@ -79,4 +84,5 @@ protected:
 
 	class APuzzleGridBase* PuzzleBoardRef;
 
+	UTriptychGameInstance* TriptychGI;
 };

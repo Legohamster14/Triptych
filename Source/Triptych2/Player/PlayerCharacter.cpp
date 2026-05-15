@@ -8,6 +8,8 @@
 #include "Triptych2/Puzzle/PuzzleGridBase.h"
 #include "Triptych2/Alien/AlienCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Triptych2/Player/TriptychGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -27,6 +29,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	LeftMouseQueryParams.AddIgnoredActor(this);
 	EQueryParams.AddIgnoredActor(this);
+	TriptychGI = Cast<UTriptychGameInstance>(GetGameInstance());
+
 }
 
 
@@ -65,6 +69,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("LeftClick", IE_Pressed, this, &APlayerCharacter::LeftMouseInteract);
 	PlayerInputComponent->BindAction("Drop", IE_Pressed, this, &APlayerCharacter::DropObject);
 	PlayerInputComponent->BindAction("E", IE_Pressed, this, &APlayerCharacter::EInteract);
+	PlayerInputComponent->BindAction("ResetLevel", IE_Pressed, this, &APlayerCharacter::ResetLevel);
 
 }
 
@@ -194,4 +199,15 @@ void APlayerCharacter::DropObject()
 void APlayerCharacter::EInteract()
 {
 
+}
+
+void APlayerCharacter::ResetLevel()
+{
+	TriptychGI->CompletedPuzzles = 0;
+	TriptychGI->TotalPuzzles = 0;
+	FPlayers CurrentPlayer;
+	CurrentPlayer.PlayerName = CurrentPlayerName;
+	CurrentPlayer.PlayerPoints = Points;
+	TriptychGI->PlayersArray.Add(CurrentPlayer);
+	UGameplayStatics::OpenLevel(this, FName(GetWorld()->GetMapName()));
 }

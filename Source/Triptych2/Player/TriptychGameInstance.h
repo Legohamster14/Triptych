@@ -9,6 +9,18 @@
 /**
  * 
  */
+
+USTRUCT(BlueprintType)
+struct FPlayers
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FString PlayerName;
+	UPROPERTY(BlueprintReadWrite)
+	int32 PlayerPoints;
+};
+
 UCLASS()
 class TRIPTYCH2_API UTriptychGameInstance : public UGameInstance
 {
@@ -19,5 +31,8 @@ public:
 	int32 TotalPuzzles;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzles")
 	int32 CompletedPuzzles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ScoreBoard")
+	TArray<FPlayers> PlayersArray;
 
 };
